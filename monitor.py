@@ -26,7 +26,7 @@ is_monitoring = False
 last_status = {}
 last_hourly_report_hour = -1
 
-CURRENT_VERSION = "2.2"
+CURRENT_VERSION = "2.3"
 UPDATE_AVAILABLE = False
 REMOTE_VERSION = ""
 
@@ -131,12 +131,6 @@ def is_app_running(package_name):
         return package_name in output
     except: return False
 
-def restart_app(package_name):
-    try:
-        # Menggunakan monkey untuk menjalankan aplikasi via package name
-        os.system(f"monkey -p {package_name} -c android.intent.category.LAUNCHER 1 > /dev/null 2>&1")
-    except: pass
-
 def clear_ram_smart():
     try:
         os.system("sync")
@@ -186,27 +180,21 @@ def monitor_loop():
                         send_telegram_msg(msg)
                     last_hourly_report_hour = curr_hour
 
-                # Cek Aplikasi Mati (Alert & Auto-Restart)
+                # Cek Aplikasi Mati (Alert)
                 for app in APPS_TO_MONITOR:
                     running = is_app_running(app)
-                    if not running:
-                        if last_status.get(app, True): # Berubah dari hidup ke mati
-                            stats = get_system_info()
-                            msg = (
-                                "🔴 *PERINGATAN: APLIKASI MATI*\n"
-                                "━━━━━━━━━━━━━━━━━━━━━━\n"
-                                f"📦 *Paket:* `{app}`\n"
-                                f"⏰ *Waktu:* `{curr_time_str}`\n"
-                                f"💾 *RAM:* `{stats['mem_used']}MB / {stats['mem_total']}MB`\n"
-                                f"⏳ *Uptime:* `{stats['uptime']:.1f} jam`\n"
-                                "🔄 *Status:* Mencoba merestart otomatis...\n"
-                                "━━━━━━━━━━━━━━━━━━━━━━"
-                            )
-                            send_telegram_msg(msg)
-                        
-                        # Jalankan aplikasi kembali
-                        restart_app(app)
-                    
+                    if not running and last_status.get(app, True):
+                        stats = get_system_info()
+                        msg = (
+                            "🔴 *PERINGATAN: APLIKASI MATI*\n"
+                            "━━━━━━━━━━━━━━━━━━━━━━\n"
+                            f"📦 *Paket:* `{app}`\n"
+                            f"⏰ *Waktu:* `{curr_time_str}`\n"
+                            f"💾 *RAM:* `{stats['mem_used']}MB / {stats['mem_total']}MB`\n"
+                            f"⏳ *Uptime Sistem:* `{stats['uptime']:.1f} jam`\n"
+                            "━━━━━━━━━━━━━━━━━━━━━━"
+                        )
+                        send_telegram_msg(msg)
                     last_status[app] = running
                 
                 clear_ram_smart()
