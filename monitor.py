@@ -26,7 +26,7 @@ is_monitoring = False
 last_status = {}
 last_hourly_report_hour = -1
 
-CURRENT_VERSION = "2.3"
+CURRENT_VERSION = "2.4"
 UPDATE_AVAILABLE = False
 REMOTE_VERSION = ""
 
@@ -82,9 +82,10 @@ RESET = "\033[0m"
 def get_system_info():
     info = {
         'mem_total': 0, 'mem_avail': 0, 'mem_used': 0,
-        'uptime': 0.0, 'cpu_usage': 0, 'cores': os.cpu_count() or 0
+        'uptime': 0.0, 'cpu_usage': 0, 'cores': 1
     }
     try:
+        info['cores'] = os.cpu_count() or 1
         with open('/proc/meminfo', 'r') as f:
             for line in f:
                 if "MemTotal" in line: info['mem_total'] = int(line.split()[1]) // 1024
@@ -96,26 +97,26 @@ def get_system_info():
             
         with open('/proc/loadavg', 'r') as f:
             load1 = float(f.read().split()[0])
-            info['cpu_usage'] = int((load1 / info['cores']) * 100) if info['cores'] > 0 else 0
+            # Hitung persentase beban CPU relatif terhadap core, max 100% untuk awam
+            usage = int((load1 / info['cores']) * 100)
+            info['cpu_usage'] = min(usage, 100)
     except: pass
     return info
 
 def get_app_uptime(package_name):
     try:
-        pid = subprocess.check_output(['pidof', package_name]).decode('utf-8').strip().split()[0]
-        with open(f'/proc/{pid}/stat', 'r') as f:
-            content = f.read().split(')')
-            start_time_jiffies = int(content[-1].split()[19])
-        hertz = 100
-        try: hertz = os.sysconf(os.sysconf_names['SC_CLK_TCK'])
-        except: pass
-        with open('/proc/uptime', 'r') as f:
-            sys_uptime = float(f.read().split()[0])
-        uptime_sec = sys_uptime - (start_time_jiffies / hertz)
-        if uptime_sec < 60: return f"{int(uptime_sec)}s"
-        if uptime_sec < 3600: return f"{int(uptime_sec//60)}m"
-        return f"{uptime_sec/3600:.1f}j"
-    except: return "0m"
+        # Mencoba mendapatkan uptime menggunakan ps -o etimes (detik aktif)
+        output = subprocess.check_output(['ps', '-A', '-o', 'NAME,ETIMES'], stderr=subprocess.STDOUT).decode('utf-8').splitlines()
+        for line in output:
+            if package_name in line:
+                parts = line.strip().split()
+                # Pastikan kolom terakhir adalah angka (detik)
+                uptime_sec = int(parts[-1])
+                if uptime_sec < 60: return f"{uptime_sec} dtk"
+                if uptime_sec < 3600: return f"{int(uptime_sec/60)} mnt"
+                return f"{uptime_sec/3600:.1f} jam"
+    except: pass
+    return "0 mnt"
 
 def send_telegram_msg(message):
     if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
