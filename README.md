@@ -1,18 +1,19 @@
-# 🚀 App Monitor & RAM Cleaner Pro v2.0
+# 🚀 App Monitor & RAM Cleaner Pro v2.2
 **Monitor Sistem Android Interaktif & Pembersih RAM Cerdas lewat Termux!**
 
-Skrip Python profesional untuk memantau aplikasi Android secara real-time. Jika aplikasi mati, Anda akan menerima notifikasi instan via Telegram. Dilengkapi dengan dashboard dinamis yang menampilkan penggunaan RAM, Uptime, dan status aplikasi secara otomatis setiap 2 detik.
+Skrip Python profesional untuk memantau aplikasi Android secara real-time. Jika aplikasi mati, skrip akan **otomatis membuka kembali aplikasi** dan mengirimkan notifikasi instan via Telegram. Dilengkapi dengan dashboard dinamis yang menampilkan penggunaan RAM, Beban CPU, dan status aplikasi secara otomatis.
 
 ---
 
 ## 🌟 Fitur Unggulan
 - 🖥️ **Interactive CLI Menu**: Tampilan profesional dengan bingkai dan skema warna modern.
-- 📊 **Dynamic Dashboard**: Update otomatis (setiap 2 detik) untuk:
-    - Penggunaan RAM (Total, Used, Free) dengan progress bar berwarna.
-    - Waktu aktif sistem (Uptime).
-    - Status aplikasi (Online/Offline).
+- 🔄 **Auto-Restart System**: Secara otomatis membuka kembali aplikasi yang terdeteksi mati atau *force close* menggunakan perintah `monkey`.
+- 📊 **Dynamic Dashboard**: Update otomatis untuk:
+    - Penggunaan RAM (Total, Used, Free) dengan progress bar.
+    - **Beban CPU**: Tampilan persentase yang mudah dipahami.
+    - **App Uptime**: Mengetahui berapa lama aplikasi target telah berjalan.
 - ⚙️ **In-App Management**: Tambah atau hapus aplikasi yang dipantau & daftar whitelist langsung dari menu tanpa edit kode.
-- 📩 **Smart Telegram Alert**: Notifikasi detail saat aplikasi mati (termasuk info RAM & Uptime saat kejadian).
+- 📩 **Smart Telegram Alert**: Notifikasi detail saat aplikasi mati, lengkap dengan info RAM, Uptime Sistem, dan konfirmasi restart otomatis.
 - 🧹 **Pembersih RAM Cerdas**: Menghapus cache sistem dan menghentikan aplikasi latar belakang yang tidak penting (Optimal dengan akses Root).
 - 🔄 **Multithreading**: Pemantauan tetap berjalan di latar belakang saat Anda menavigasi menu.
 
